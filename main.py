@@ -73,6 +73,68 @@ class Board:
     def on_click(self, cell):
         pass
 
+class Button:
+    def create_button(self, surface, color, x, y, length, height, width, text):
+        surface = self.draw_button(surface, color, length, height, x, y, width)
+        surface = self.write_text(surface, text, length, height, x, y)
+        self.rect = pygame.Rect(x,y, length, height)
+        return surface
+
+    def write_text(self, surface, text, length, height, x, y):
+        font_size = int(length//len(text))
+        myFont = pygame.font.SysFont("Calibri", font_size)
+        myText = myFont.render(text, 1)
+        surface.blit(myText, ((x+length/2) - myText.get_width()/2, (y+height/2) - myText.get_height()/2))
+        return surface
+
+    def draw_button(self, surface, color, length, height, x, y, width):
+        for i in range(1,10):
+            s = pygame.Surface((length+(i*2),height+(i*2)))
+            s.fill(color)
+            alpha = (255/(i+2))
+            if alpha <= 0:
+                alpha = 1
+            s.set_alpha(alpha)
+            pygame.draw.rect(s, color, (x-i,y-i,length+i,height+i), width)
+            surface.blit(s, (x-i,y-i))
+        pygame.draw.rect(surface, color, (x,y,length,height), 0)
+        pygame.draw.rect(surface, (190,190,190), (x,y,length,height), 1)
+        return surface
+
+    def pressed(self, mouse):
+        if mouse[0] > self.rect.topleft[0]:
+            if mouse[1] > self.rect.topleft[1]:
+                if mouse[0] < self.rect.bottomright[0]:
+                    if mouse[1] < self.rect.bottomright[1]:
+                        print("Some button was pressed!")
+                        return True
+                    else: return False
+                else: return False
+            else: return False
+        else: return False
+    
+def start_screen():
+    intro_text = ["Охота за сокровищами", "",
+                  "Правила игры",
+                  "Тебе нужно собрать больше сокровищ чем искуственный интеллект",
+                  "Ты можешь ходить в любую сторону",
+                  "Прыгать через клетки и ходить по диагонали нельзя",
+                  "Составь оптимальный маршрут для сбора",
+                  "Удачи"]
+
+    fon = pygame.transform.scale(load_image('сундук.png'), (1680, 1050))
+    screen.blit(fon, (0, 0))
+    font = pygame.font.Font(None, 30)
+    text_coord = 50
+    for line in intro_text:
+        string_rendered = font.render(line, 1, pygame.Color('white'))
+        intro_rect = string_rendered.get_rect()
+        text_coord += 10
+        intro_rect.top = text_coord
+        intro_rect.x = 10
+        text_coord += intro_rect.height
+        screen.blit(string_rendered, intro_rect)
+
 def load_level(filename):
     filename = "data/" + filename
     with open(filename, 'r') as mapFile:
